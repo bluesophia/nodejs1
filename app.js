@@ -23,7 +23,10 @@ connection.connect( (err) => {
 		console.log("연결에 성공했습니다.");
 	}
 });
-
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/public/views');
+app.engine('html', require('ejs').renderFile);
+app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json())//data body parsing,들어오는데이터는 json만 받는다
 //미들웨어 연결하는 애 app은 미들웨어
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -35,7 +38,7 @@ ex)정유빈 -> %fdjkf% ->깨지는 것을 방지
 
 
 
-app.get('/', (req, res) => {
+app.get('/database', (req, res) => {
 	//get방식에 유알엘이 / 로 들어왔을 때 -> uri
 	const query = connection.query('SELECT * FROM users', (err, rows) => {
 		if(err) throw err;
@@ -43,6 +46,9 @@ app.get('/', (req, res) => {
 		res.json(users);
 	});
 })
+app.get('/index', (req, res) => {
+	res.render('index.html');
+});
 
 app.listen(3000, () => {
 	console.log('hello');
