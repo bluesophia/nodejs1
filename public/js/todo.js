@@ -1,3 +1,4 @@
+
 var todo = {
  //저장
  save: function(){
@@ -16,28 +17,25 @@ var todo = {
      }
    },
 
- 	/*//수정
- 	put: function put_item(){
- 		var objSpan = $(this);
-	 	$.ajax({
-	 			url: 'http://139.59.230.182:3002/tasks/'+objSpan.data('id'),
-	 			type: 'DELETE',
-
-	 		}).done(function(data) {
-	 			//변수에 불러올 속성값(data-id) 가져온다.
-	 				objSpan.closest('li').remove();
-	 			//찾은 값을 지운다.
-	 		})
-	 		// var remove = $(this).closest('.li');
-	 		// remove.remove();
-	 	},
+ 	//수정
+  // update: function(){
+ 	// 	var li = $(this);
+ 	// 	$.ajax({
+ 	// 		url: 'api/user'+li.data('id'),
+ 	// 		type: 'PUT',
+  //
+ 	// 		}).done(function(data) {
+	// 			console.log("success");
+	// 			li.toggleClass('completed');
+ 	// 		})
+ 	// 	},
 
  	//삭제
  	del: function delete_item(){
 	 	//ajax으로 데이터 불러온다.
 	 	var objSpan = $(this);
 	 	$.ajax({
-	 			url: 'http://139.59.230.182:3002/tasks/'+objSpan.data('id'),
+	 			url: 'api/user'+objSpan.data('id'),
 	 			type: 'DELETE',
 
 	 		}).done(function(data) {
@@ -47,23 +45,17 @@ var todo = {
 	 		})
 	 		// var remove = $(this).closest('.li');
 	 		// remove.remove();
- 		},*/
+ 		},
 
  	//이벤트
- 	setEvent: function(){
+  setEvent: function(){
  		//enter 후 save로 감
  		var input = $('.input');
  		input.keypress(this.save);
-
- 		// 이름 클릭 후 put으로감
- 		var put = $(this);
- 		$('.ul').on('click', '.li' , function(){
- 			alert('put');
- 		});
-
  		//span 클릭 후 del로 감
  		$('.ul').on('click', '.span', todo.del);
-
+ 		//span 클릭 후 update로 감
+ 		$('.ul').on('click', '.li', todo.update);
  	},
 
  	//실행
@@ -81,3 +73,4 @@ var todo = {
  		})
  	}
  }
+todo.init();

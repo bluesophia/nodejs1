@@ -4,7 +4,7 @@ import mysql from 'mysql'
 import bodyParser from 'body-parser'//uri 안깨지도록
 import path from 'path'
 import connection from 'express-myconnection'
-//import expressValidator from 'express-validator'//request 유효값 검사
+
 
 /*Set const*/
 const app = express();
@@ -72,43 +72,66 @@ router.use(function(req, res, next) {
 
 var curut = router.route('/index');
 app.use('/api', router);
-/*GET-Bring Data*/
 // userdb.get(function(req, res, next) {
 // 	/*미들웨어 함수에 대한 HTTP 응답, 요청 인수*/
 // 	/*미들웨어 함수에 대한 콜백 인수(일반적으로 "next"라 불림).*/
-// 	req.getConnection(function(err, conn){
-// 		if(err) return next("cannot connect");
-// 		let query = ('SELECT * FROM users', function(err, rows){
-// 			if(err){
-// 				console.log(err);
-// 				return next("mysql error, check your query");
-// 			}
-// 				res.render('user',{title:"RESTful Crud Example-Sophia",data:rows})
-// 		});
-// 	});
-// });
 
-
+//GET
 curut.get(function(req,res,next){
-
-
     req.getConnection(function(err,conn){
-
         if (err) return next("Cannot Connect");
-
         var query = conn.query('SELECT * FROM users',function(err,rows){
-
             if(err){
                 console.log(err);
                 return next("Mysql error, check your query");
             }
-
             res.render('index',{title:"Todo List",data:rows});
-
          });
-
     });
+});
+//post
+curut.post(function(req,res,next){
 
+    //get data
+    var data = {
+        name:req.body.name,
+     };
+
+    //inserting into mysql
+    req.getConnection(function (err, conn){
+        if (err) return next("Cannot Connect");
+        var query = conn.query("INSERT INTO users set ? ",data, function(err, rows){
+           if(err){
+                console.log(err);
+                return next("Mysql error, check your query");
+           }
+          res.sendStatus(200);
+        });
+     });
+});
+
+//delete
+curut.delete(function(req,res,next){
+
+    var user_id = req.params.user_id;
+
+     req.getConnection(function (err, conn) {
+
+        if (err) return next("Cannot Connect");
+
+        var query = conn.query("DELETE FROM users  WHERE user_id = ? ",[user_id], function(err, rows){
+
+             if(err){
+                console.log(err);
+                return next("Mysql error, check your query");
+             }
+
+             res.sendStatus(200);
+
+        });
+        //console.log(query.sql);
+
+     });
 });
 
 // app.get('/database', (req, res) => {
@@ -121,55 +144,6 @@ curut.get(function(req,res,next){
 // 	});
 // });
 
-
-//데이터 가져오기2
-// db.all(function(req,res,next){
-// 	console.log("You need to smth about db Route ? Do it here");
-// 	console.log(req.params);
-// 	next();
-// });
-//
-// db.get(function(res, req, next){
-// 	var users_id = req.params.user_id;
-// 	req.getConnection(function(err,conn){
-//
-// 		if(err) return next("Cannot Connect");
-// 		var query = conn.query('SELECT * FROM user where users_id=?',[users_id], function(err, rows){
-// 			if(err){
-// 				console.log(err);
-// 				return next("mysql error, check your query");
-// 			}
-// 			if(rows.length < 1)
-// 			return res.send("User Not Found");
-// 			res.render('edit', {title:"Edit user", data:rows});
-// 		});
-// 	});
-// });
-//get(read)-데이터 id 가져오기
-// app.get("/database/:id", function (req, res) {
-// 	//get방식에 유알엘이 / 로 들어왔을 때 -> uri
-// 	//let users_id = req.params.id;
-// 	if(!req.params.id){
-// 		return res.status(400).send({ error: true, message: 'please provide users_id'});
-// 	}
-// 	connection.query('SELECT * FROM users where id=?', function (err, rows, fields) {
-// 		if(err) throw err;
-// 		return res.send({ error: false, data : results[0], message: 'todo lists.'});
-// 		//const users = rows.length !== 0 ? rows[0] : { message : 'Todos' }
-// 		//res.json(users);
-// 	});
-// });
-
-
-
-
-
-// router.get('/', function(req, res, next) {
-// 	res.locals.connection.query('SELECT * from users', function (drror, results, fields){
-// 		if(error) throw err;
-// 		res.send(JSON.stringify({ "status" : 200, "error" : null, "response" : results}));
-// 	});
-// });
 
 app.listen(3000, () => {
 	console.log('hello');
