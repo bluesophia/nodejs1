@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%=title%></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" ></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Todo List <i class="fa fa-plus"></i> </h1>
+        <input type="text" placeholder="Add New Todo" class="input" name="name">
+        <% if(data.length){
+         for(var i = 0;i < data.length;i++) { %>
+        <ul class="ul">
+            <li class="li"><span class="span" data-id="" ><i class="fa fa-trash-o"></i></span><%=data[i].name%></li>
+            <% }
+         }else{ %>
+             <p>no data</p>
+        <% } %>
+        </ul>
+    </div>
+</body>
+<script src=/js/todo.js></script>
+<script>$(todo.init)</script>
+</html>
