@@ -1,12 +1,12 @@
 
 var todo = {
- //저장
+ //POST
  save: function(){
    if(event.which == 13) {
      var val = $('.input').val();
      $.post("/api/index",{ name : val }, function(data){
        console.log(data);
-       $('.ul').append('<li class="li"><span class="span" data-id="'+data._id+'"><i class="fa fa-trash-o"></i></span>'+data.name+'</li>');
+       $('.ul').append('<li class="li"><span class="span" data-id="'+data.id+'"><i class="fa fa-trash-o"></i></span>'+data.name+'</li>');
        })
          .done(function(){
            alert("saved");
@@ -17,59 +17,61 @@ var todo = {
      }
    },
 
- 	//수정
-  // update: function(){
- 	// 	var li = $(this);
- 	// 	$.ajax({
- 	// 		url: 'api/user'+li.data('id'),
- 	// 		type: 'PUT',
-  //
- 	// 		}).done(function(data) {
-	// 			console.log("success");
-	// 			li.toggleClass('completed');
- 	// 		})
- 	// 	},
+ 	/*//UPDATE
+  update: function update_item(){
+ 		var li = $(this);
+ 		$.ajax({
+ 			url: 'api/index'+li.data('id'),
+ 			type: 'PUT',
 
- 	//삭제
+ 			}).done(function(data) {
+				console.log("success");
+				li.toggleClass('completed');
+ 			}).fail(function(){
+        alert('update fail');
+      })
+ 		},*/
+
+ 	//DELETE
  	del: function delete_item(){
-	 	//ajax으로 데이터 불러온다.
-	 	var objSpan = $(this);
-	 	$.ajax({
-	 			url: 'api/user'+objSpan.data('id'),
-	 			type: 'DELETE',
 
+    var objSpanid = $(this).data('id');
+    var objSpan = $(this);
+
+	 	$.ajax({
+	 			url: '/api/index/'+ objSpanid,
+	 			type: 'DELETE',
+        data: objSpanid
 	 		}).done(function(data) {
 	 			//변수에 불러올 속성값(data-id) 가져온다.
 	 				objSpan.closest('li').remove();
 	 			//찾은 값을 지운다.
-	 		})
-	 		// var remove = $(this).closest('.li');
-	 		// remove.remove();
+	 		}).fail(function(){
+        alert('fail');
+      })
  		},
 
- 	//이벤트
+ 	//SET event
   setEvent: function(){
- 		//enter 후 save로 감
+    //엔터 후 save
  		var input = $('.input');
  		input.keypress(this.save);
- 		//span 클릭 후 del로 감
+
+ 		//span 클릭 후 del
  		$('.ul').on('click', '.span', todo.del);
- 		//span 클릭 후 update로 감
+
+ 		//span 클릭 후 update
  		$('.ul').on('click', '.li', todo.update);
  	},
 
- 	//실행
+ 	//INIT
  	init: function(){
  		todo.setEvent();
- 		//data 불러오기
- 		$.get("http://localhost:3000/api/index", function(data){
- 			//each로 값꺼내기
+ 		$.get("/api/index", function(data){
  			$.each(data, function(index, value){
  				console.log(value);
- 				// append로 뒤에 붙이기
- 				$('.ul').append('<li class="li"><span class="span" data-id="'+value._id+'"><i class="fa fa-trash-o"></i></span>'+value.name+'</li>');
+ 				$('.ul').append('<li class="li"><span class="span" data-id="'+value.id+'"><i class="fa fa-trash-o"></i></span>'+value.name+'</li>');
  			})
-
  		})
  	}
  }

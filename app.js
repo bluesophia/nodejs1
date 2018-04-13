@@ -9,13 +9,27 @@ import connection from 'express-myconnection'
 /*Set const*/
 const app = express();
 const router = express.Router();
-// const conn = mysql.createConnection({
-// 	host : 'localhost',
-// 	port : 3306,
-// 	user : 'root',
-// 	password : '',
-// 	database: 'new_schema'
-// });
+
+/*//tutor
+const conn = mysql.createConnection({
+	host : 'localhost',
+	port : 3306,
+	user : 'root',
+	password : '',
+	database: 'new_schema'
+});
+
+//mysql connection
+connection.connect( (err) => {
+	if(err){
+		console.error('mysql connection error');
+		console.error(err);
+		throw err;
+	} else {
+		console.log("연결에 성공했습니다.");
+	}
+});*/
+
 app.use(
 
     connection(mysql,{
@@ -31,7 +45,6 @@ app.use(
 /*Set template engine*/
 app.set('view engine', 'ejs');
 app.set('views','./views');
-//app.engine('html', require('ejs').renderFile);
 
 /*Module Express use*/
 app.use(express.static('public'));
@@ -45,36 +58,13 @@ app.use(bodyParser.urlencoded({ extended: true }));//support x-www-form-urlencod
 ex)정유빈 -> %fdjkf% ->깨지는 것을 방지
 자바스크립트에서도 쓴다 클라이언트, 서버 양쪽에 맞춰주는 것이 좋다 */
 
-//app.use(expressValidator());
 
-/*mysql connection*/
-// connection.connect( (err) => {
-// 	if(err){
-// 		console.error('mysql connection error');
-// 		console.error(err);
-// 		throw err;
-// 	} else {
-// 		console.log("연결에 성공했습니다.");
-// 	}
-// });
 
-/*-----------
-CRUD API
------------*/
-
-/*RESTful set route*/
-/*Use router*/
-router.use(function(req, res, next) {
-    console.log(req.method, req.url);
-    next();
-		/*현재의 미들웨어 함수가 요청-응답 주기를 종료하지 않는 경우에는 next()를 호출하여 그 다음 미들웨어 함수에 제어를 전달해야 한다. 그렇지 않으면 해당 요청은 정지된 채로 방치됨*/
-});
-
+/*--------------------------
+CRUD API1-api/index/
+----------------------------*/
+//route1
 var curut = router.route('/index');
-app.use('/api', router);
-// userdb.get(function(req, res, next) {
-// 	/*미들웨어 함수에 대한 HTTP 응답, 요청 인수*/
-// 	/*미들웨어 함수에 대한 콜백 인수(일반적으로 "next"라 불림).*/
 
 //GET
 curut.get(function(req,res,next){
@@ -82,27 +72,28 @@ curut.get(function(req,res,next){
         if (err) return next("Cannot Connect");
         var query = conn.query('SELECT * FROM users',function(err,rows){
             if(err){
-                console.log(err);
+                throw err;
                 return next("Mysql error, check your query");
+								/*미들웨어 함수에 대한 콜백 인수(일반적으로 "next"라 불림).*/
+								/*현재의 미들웨어 함수가 요청-응답 주기를 종료하지 않는 경우에는 next()를 호출하여 그 다음 미들웨어 함수에 제어를 전달해야 한다. 그렇지 않으면 해당 요청은 정지된 채로 방치됨*/
             }
             res.render('index',{title:"Todo List",data:rows});
          });
     });
 });
-//post
+
+//POST
 curut.post(function(req,res,next){
 
-    //get data
     var data = {
         name:req.body.name,
      };
 
-    //inserting into mysql
     req.getConnection(function (err, conn){
         if (err) return next("Cannot Connect");
         var query = conn.query("INSERT INTO users set ? ",data, function(err, rows){
            if(err){
-                console.log(err);
+                throw err;
                 return next("Mysql error, check your query");
            }
           res.sendStatus(200);
@@ -110,30 +101,24 @@ curut.post(function(req,res,next){
      });
 });
 
-//delete
+//DELETE
 curut.delete(function(req,res,next){
 
-    var user_id = req.params.user_id;
+    var id = req.params.id;
 
      req.getConnection(function (err, conn) {
-
         if (err) return next("Cannot Connect");
-
-        var query = conn.query("DELETE FROM users  WHERE user_id = ? ",[user_id], function(err, rows){
-
+        var query = conn.query("DELETE FROM users WHERE id = ? ",[id], function(err, rows){
              if(err){
-                console.log(err);
+                throw err;
                 return next("Mysql error, check your query");
              }
-
              res.sendStatus(200);
-
         });
-        //console.log(query.sql);
-
      });
 });
 
+/*Tutor*/
 // app.get('/database', (req, res) => {
 // 	//get방식에 유알엘이 / 로 들어왔을 때 -> uri
 // 	connection.query('SELECT * FROM users', (err, rows, fields) => {
@@ -144,6 +129,28 @@ curut.delete(function(req,res,next){
 // 	});
 // });
 
+/*--------------------------
+CRUD API2-api/index/:id
+----------------------------*/
+var routerId = router.route('/index/:id');
+
+//delete data
+routerId.delete(function(req,res,next){
+
+    var id = req.params.id;
+
+     req.getConnection(function (err, conn) {
+        if (err) return next("Cannot Connect");
+        var query = conn.query("DELETE FROM users  WHERE id = ? ",[id], function(err, rows){
+             if(err){
+                console.log(err);
+                return next("Mysql error, check your query");
+             }
+             res.sendStatus(200);
+        });
+     });
+});
+app.use('/api', router);
 
 app.listen(3000, () => {
 	console.log('hello');
